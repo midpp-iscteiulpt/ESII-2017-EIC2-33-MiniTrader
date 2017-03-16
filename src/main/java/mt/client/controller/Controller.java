@@ -19,7 +19,7 @@ import mt.comm.ClientSideMessage;
 
 
 
-/*This is a test Comment*/
+/*This is a test comment*/
 
 public class Controller {
 
