@@ -293,7 +293,6 @@ public class MicroServer implements MicroTraderServer {
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			for (Order o : entry.getValue()) {
 				if (o.isBuyOrder() && o.getStock().equals(sellOrder.getStock()) && o.getPricePerUnit() >= sellOrder.getPricePerUnit()) {
-					System.out.println("quarto");
 					doTransaction (o, sellOrder);
 				}
 			}
@@ -313,7 +312,6 @@ public class MicroServer implements MicroTraderServer {
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			for (Order o : entry.getValue()) {
 				if (o.isSellOrder() && buyOrder.getStock().equals(o.getStock()) && o.getPricePerUnit() <= buyOrder.getPricePerUnit()) {
-					System.out.println("primeiro");
 					doTransaction(buyOrder, o);
 				}
 			}
@@ -348,10 +346,8 @@ public class MicroServer implements MicroTraderServer {
 		
 		updatedOrders.add(buyOrder);
 		updatedOrders.add(sellerOrder);
-		System.out.println("nao passou");
 		XmlLogger.write(transactionId, buyOrder.getNickname(), sellerOrder.getNickname(), buyOrder.getStock(), units, price);
 		transactionId++;
-		System.out.println("passou");
 	}
 	
 	/**
