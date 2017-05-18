@@ -61,6 +61,11 @@ public class MicroServer implements MicroTraderServer {
 	public static final int EMPTY = 0;
 
 	/**
+	 * Transaction ID
+	 */
+	private static int transactionId=1;
+	
+	/**
 	 * Constructor
 	 */
 	public MicroServer() {
@@ -218,6 +223,7 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Processing new order...");
 
 		Order o = msg.getOrder();
+		if(o.getNumberOfUnits()<10) return;
 		
 		// save the order on map
 		saveOrder(o);
@@ -269,6 +275,7 @@ public class MicroServer implements MicroTraderServer {
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			for (Order o : entry.getValue()) {
 				if (o.isBuyOrder() && o.getStock().equals(sellOrder.getStock()) && o.getPricePerUnit() >= sellOrder.getPricePerUnit()) {
+					System.out.println("quarto");
 					doTransaction (o, sellOrder);
 				}
 			}
@@ -288,6 +295,7 @@ public class MicroServer implements MicroTraderServer {
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			for (Order o : entry.getValue()) {
 				if (o.isSellOrder() && buyOrder.getStock().equals(o.getStock()) && o.getPricePerUnit() <= buyOrder.getPricePerUnit()) {
+					System.out.println("primeiro");
 					doTransaction(buyOrder, o);
 				}
 			}
@@ -303,19 +311,30 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private void doTransaction(Order buyOrder, Order sellerOrder) {
 		LOGGER.log(Level.INFO, "Processing transaction between seller and buyer...");
-
+		System.out.println("segundo");
+		int units;
+		Double price = Double.min(buyOrder.getPricePerUnit(), sellerOrder.getPricePerUnit());
 		if (buyOrder.getNumberOfUnits() >= sellerOrder.getNumberOfUnits()) {
 			buyOrder.setNumberOfUnits(buyOrder.getNumberOfUnits()
 					- sellerOrder.getNumberOfUnits());
+			units = sellerOrder.getNumberOfUnits();
 			sellerOrder.setNumberOfUnits(EMPTY);
 		} else {
 			sellerOrder.setNumberOfUnits(sellerOrder.getNumberOfUnits()
 					- buyOrder.getNumberOfUnits());
+			units = buyOrder.getNumberOfUnits();
 			buyOrder.setNumberOfUnits(EMPTY);
 		}
 		
+		
+		
+		
 		updatedOrders.add(buyOrder);
 		updatedOrders.add(sellerOrder);
+		System.out.println("nao passou");
+		XmlLogger.write(transactionId, buyOrder.getNickname(), sellerOrder.getNickname(), buyOrder.getStock(), units, price);
+		transactionId++;
+		System.out.println("passou");
 	}
 	
 	/**
