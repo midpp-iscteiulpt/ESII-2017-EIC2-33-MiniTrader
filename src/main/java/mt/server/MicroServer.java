@@ -103,6 +103,8 @@ public class MicroServer implements MicroTraderServer {
 					processUserDisconnected(msg);
 					break;
 				case NEW_ORDER:
+					if(invalidOrder(msg.getOrder())) break;
+			
 					try {
 						verifyUserConnected(msg);
 						if(msg.getOrder().getServerOrderID() == EMPTY){
@@ -119,6 +121,13 @@ public class MicroServer implements MicroTraderServer {
 				}
 		}
 		LOGGER.log(Level.INFO, "Shutting Down Server...");
+	}
+
+
+	private boolean invalidOrder(Order order) {
+		if(order.getNumberOfUnits()<10) return true;
+		
+		return false;
 	}
 
 
@@ -223,7 +232,6 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Processing new order...");
 
 		Order o = msg.getOrder();
-		if(o.getNumberOfUnits()<10) return;
 		
 		// save the order on map
 		saveOrder(o);
@@ -311,7 +319,6 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private void doTransaction(Order buyOrder, Order sellerOrder) {
 		LOGGER.log(Level.INFO, "Processing transaction between seller and buyer...");
-		System.out.println("segundo");
 		int units;
 		Double price = Double.min(buyOrder.getPricePerUnit(), sellerOrder.getPricePerUnit());
 		if (buyOrder.getNumberOfUnits() >= sellerOrder.getNumberOfUnits()) {
@@ -362,6 +369,7 @@ public class MicroServer implements MicroTraderServer {
 		if(order == null){
 			throw new ServerException("There was no order in the message");
 		}
+		if(order.getNumberOfUnits()<10) return;
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			serverComm.sendOrder(entry.getKey(), order); 
 		}
