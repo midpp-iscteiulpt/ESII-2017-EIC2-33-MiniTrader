@@ -103,7 +103,7 @@ public class MicroServer implements MicroTraderServer {
 					processUserDisconnected(msg);
 					break;
 				case NEW_ORDER:
-					if(invalidOrder(msg.getOrder())) break;
+					if(invalidOrderAS(msg.getOrder())) break;
 			
 					try {
 						verifyUserConnected(msg);
@@ -123,10 +123,20 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Shutting Down Server...");
 	}
 
-
-	private boolean invalidOrder(Order order) {
+	/**
+	 * Verify if order is invalid
+	 * according to business rules and constraints
+	 * specified for the region
+	 * 
+	 * @param order
+	 * 			the order sent by the client
+	 * @return
+	 * 			false if order if valid
+	 * 			true if odder is invalid
+	 */
+	private boolean invalidOrderAS(Order order) {
+		//a single order quantity (buy or sell) can never be lower than 10 units
 		if(order.getNumberOfUnits()<10) return true;
-		
 		return false;
 	}
 
