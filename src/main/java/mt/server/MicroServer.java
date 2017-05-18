@@ -98,6 +98,7 @@ public class MicroServer implements MicroTraderServer {
 					processUserDisconnected(msg);
 					break;
 				case NEW_ORDER:
+					if(invalidOrderEU(msg.getOrder())) break;
 					try {
 						verifyUserConnected(msg);
 						if(msg.getOrder().getServerOrderID() == EMPTY){
@@ -114,6 +115,29 @@ public class MicroServer implements MicroTraderServer {
 				}
 		}
 		LOGGER.log(Level.INFO, "Shutting Down Server...");
+	}
+	
+	private boolean invalidOrderEU(Order order) {
+		// a single order quantity (buy or sell) can never be lower than 10
+		// units
+		if (order.getNumberOfUnits() < 10)
+			return true;
+
+		// clients are not allowed to issue sell orders for their own buy orders
+		// and vice versa
+		// if order is sell order
+		if (order.isSellOrder()) {
+			for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
+				for (Order o : entry.getValue()) {
+					if (o.isBuyOrder() && o.getNickname().equals(order.getNickname())
+							&& o.getStock().equals(order.getStock())) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 
 
