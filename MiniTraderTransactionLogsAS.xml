@@ -1,5 +1,3 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <XML>
-<Order Buyer="sa" Id="1" Price="2.0" Seller="ines" Stock="putaDA" Units="20"/>
-<Order Buyer="sa" Id="2" Price="2.0" Seller="ines" Stock="putaDA" Units="10"/>
 </XML>
