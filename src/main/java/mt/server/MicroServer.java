@@ -52,6 +52,13 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private Set<Order> updatedOrders;
 
+	
+	/**
+	 * Transaction ID
+	 */
+	private static int transactionId=1;
+	
+	
 	/**
 	 * Order Server ID
 	 */
@@ -60,11 +67,6 @@ public class MicroServer implements MicroTraderServer {
 	/** The value is {@value #EMPTY} */
 	public static final int EMPTY = 0;
 
-	/**
-	 * Transaction ID
-	 */
-	private static int transactionId=1;
-	
 	/**
 	 * Constructor
 	 */
@@ -103,8 +105,7 @@ public class MicroServer implements MicroTraderServer {
 					processUserDisconnected(msg);
 					break;
 				case NEW_ORDER:
-					if(invalidOrderAS(msg.getOrder())) break;		
-			
+					if(invalidOrderAS(msg.getOrder())) break;
 					try {
 						verifyUserConnected(msg);
 						if(msg.getOrder().getServerOrderID() == EMPTY){
@@ -123,6 +124,7 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Shutting Down Server...");
 	}
 
+	
 	/**
 	 * Verify if order is invalid
 	 * according to business rules and constraints
@@ -139,7 +141,7 @@ public class MicroServer implements MicroTraderServer {
 		if(order.getNumberOfUnits()<10) return true;
 		return false;
 	}
-
+	
 
 	/**
 	 * Verify if user is already connected
@@ -329,6 +331,7 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Processing transaction between seller and buyer...");
 		Integer units = Integer.min(buyOrder.getNumberOfUnits(), sellerOrder.getNumberOfUnits());
 		Double price = Double.min(buyOrder.getPricePerUnit(), sellerOrder.getPricePerUnit());
+		
 		if (buyOrder.getNumberOfUnits() >= sellerOrder.getNumberOfUnits()) {
 			buyOrder.setNumberOfUnits(buyOrder.getNumberOfUnits()
 					- sellerOrder.getNumberOfUnits());
@@ -341,7 +344,6 @@ public class MicroServer implements MicroTraderServer {
 		
 		updatedOrders.add(buyOrder);
 		updatedOrders.add(sellerOrder);
-		
 		
 		XmlLogger.write(transactionId, buyOrder.getNickname(), sellerOrder.getNickname(), buyOrder.getStock(), units, price);
 		transactionId++;
@@ -372,7 +374,6 @@ public class MicroServer implements MicroTraderServer {
 		if(order == null){
 			throw new ServerException("There was no order in the message");
 		}
-		if(order.getNumberOfUnits()<10) return;
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			serverComm.sendOrder(entry.getKey(), order); 
 		}
