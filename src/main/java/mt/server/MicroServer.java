@@ -143,7 +143,7 @@ public class MicroServer implements MicroTraderServer {
 				}
 			}
 		}
-		
+
 		// if order is buy order
 		if (order.isBuyOrder()) {
 			for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
@@ -278,42 +278,28 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Processing new order...");
 
 		Order o = msg.getOrder();
-		if (o.getNumberOfUnits() < 10) {
-			return;
+
+		// save the order on map
+		saveOrder(o);
+
+		// if is buy order
+		if (o.isBuyOrder()) {
+			processBuy(msg.getOrder());
 		}
-		int counter = 0;
-		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
-			for (Order order : entry.getValue()) {
-				if (order.getNickname().equals(o.getNickname())) {
-					counter++;
-				}
-			}
 
+		// if is sell order
+		if (o.isSellOrder()) {
+			processSell(msg.getOrder());
 		}
-		if (counter < 5) {
 
-			// save the order on map
-			saveOrder(o);
+		// notify clients of changed order
+		notifyClientsOfChangedOrders();
 
-			// if is buy order
-			if (o.isBuyOrder()) {
-				processBuy(msg.getOrder());
-			}
+		// remove all fulfilled orders
+		removeFulfilledOrders();
 
-			// if is sell order
-			if (o.isSellOrder()) {
-				processSell(msg.getOrder());
-			}
-
-			// notify clients of changed order
-			notifyClientsOfChangedOrders();
-
-			// remove all fulfilled orders
-			removeFulfilledOrders();
-
-			// reset the set of changed orders
-			updatedOrders = new HashSet<>();
-		}
+		// reset the set of changed orders
+		updatedOrders = new HashSet<>();
 	}
 
 	/**
