@@ -23,7 +23,7 @@ public class XmlLogger {
 	public static void write(int id, String buyer, String seller, String stock, int units, Double price) {
 
 		try {
-			File inputFile = new File("MicroTraderTransactionLogs.xml");
+			File inputFile = new File("MiniTraderTransactionLogsAS.xml");
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(inputFile);
@@ -73,7 +73,7 @@ public class XmlLogger {
 			System.out.println("Save XML document.");
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StreamResult result = new StreamResult(new FileOutputStream("MicroTraderTransactionLogs.xml"));
+			StreamResult result = new StreamResult(new FileOutputStream("MiniTraderTransactionLogsAS.xml"));
 			DOMSource source = new DOMSource(doc);
 			transformer.transform(source, result);
 		} catch (Exception e) {
