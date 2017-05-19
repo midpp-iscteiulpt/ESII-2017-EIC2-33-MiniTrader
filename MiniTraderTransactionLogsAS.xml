@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<XML>
-<Order Buyer="filipe" Id="1" Price="3.0" Seller="ines" Stock="meias" Units="10"/>
-<Order Buyer="filipe" Id="2" Price="4.0" Seller="ines" Stock="edp" Units="10"/>
-<Order Buyer="filipe" Id="1" Price="4.0" Seller="ines" Stock="edp" Units="20"/>
-<Order Buyer="ines" Id="1" Price="5.0" Seller="filipe" Stock="edp" Units="20"/>
-</XML>

@@ -103,7 +103,7 @@ public class MicroServer implements MicroTraderServer {
 					processUserDisconnected(msg);
 					break;
 				case NEW_ORDER:
-					if(invalidOrderAS(msg.getOrder())) break;
+					if(invalidOrderAS(msg.getOrder())) break;		
 			
 					try {
 						verifyUserConnected(msg);
