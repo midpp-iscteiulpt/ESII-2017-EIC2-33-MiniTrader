@@ -327,25 +327,22 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private void doTransaction(Order buyOrder, Order sellerOrder) {
 		LOGGER.log(Level.INFO, "Processing transaction between seller and buyer...");
-		int units;
+		Integer units = Integer.min(buyOrder.getNumberOfUnits(), sellerOrder.getNumberOfUnits());
 		Double price = Double.min(buyOrder.getPricePerUnit(), sellerOrder.getPricePerUnit());
 		if (buyOrder.getNumberOfUnits() >= sellerOrder.getNumberOfUnits()) {
 			buyOrder.setNumberOfUnits(buyOrder.getNumberOfUnits()
 					- sellerOrder.getNumberOfUnits());
-			units = sellerOrder.getNumberOfUnits();
 			sellerOrder.setNumberOfUnits(EMPTY);
 		} else {
 			sellerOrder.setNumberOfUnits(sellerOrder.getNumberOfUnits()
 					- buyOrder.getNumberOfUnits());
-			units = buyOrder.getNumberOfUnits();
 			buyOrder.setNumberOfUnits(EMPTY);
 		}
 		
-		
-		
-		
 		updatedOrders.add(buyOrder);
 		updatedOrders.add(sellerOrder);
+		
+		
 		XmlLogger.write(transactionId, buyOrder.getNickname(), sellerOrder.getNickname(), buyOrder.getStock(), units, price);
 		transactionId++;
 	}
