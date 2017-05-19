@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -370,22 +371,18 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private void doTransaction(Order buyOrder, Order sellerOrder) {
 		LOGGER.log(Level.INFO, "Processing transaction between seller and buyer...");
-		int units;
-		Double price = Double.min(buyOrder.getPricePerUnit(), sellerOrder.getPricePerUnit());
 		if (buyOrder.getNumberOfUnits() >= sellerOrder.getNumberOfUnits()) {
 			buyOrder.setNumberOfUnits(buyOrder.getNumberOfUnits() - sellerOrder.getNumberOfUnits());
-			units = sellerOrder.getNumberOfUnits();
+			System.out.println(" SELL - " + sellerOrder.getNumberOfUnits());
 			sellerOrder.setNumberOfUnits(EMPTY);
 		} else {
 			sellerOrder.setNumberOfUnits(sellerOrder.getNumberOfUnits() - buyOrder.getNumberOfUnits());
-			units = buyOrder.getNumberOfUnits();
+			System.out.println(" BUY - " + buyOrder.getNumberOfUnits());
 			buyOrder.setNumberOfUnits(EMPTY);
 		}
 
 		updatedOrders.add(buyOrder);
 		updatedOrders.add(sellerOrder);
-		XmlLogger.write(transactionId, buyOrder.getStock(), units, price);
-		transactionId++;
 	}
 
 	/**
@@ -413,9 +410,6 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private void notifyAllClients(Order order) throws ServerException {
 		LOGGER.log(Level.INFO, "Notifying clients about the new order...");
-		if (order.getNumberOfUnits() < 10) {
-			return;
-		}
 		if (order == null) {
 			throw new ServerException("There was no order in the message");
 		}
