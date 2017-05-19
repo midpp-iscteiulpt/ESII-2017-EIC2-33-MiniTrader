@@ -143,6 +143,7 @@ public class MicroServer implements MicroTraderServer {
 				}
 			}
 		}
+		
 		// if order is buy order
 		if (order.isBuyOrder()) {
 			for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
