@@ -36,8 +36,6 @@ public class MicroTraderLog {
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
 					System.out.print("Id:" + eElement.getAttribute("Id"));
-					System.out.print(" Buyer:" + eElement.getAttribute("Buyer"));
-					System.out.print(" Seller:" + eElement.getAttribute("Seller"));
 					System.out.print(" Stock:" + eElement.getAttribute("Stock"));
 					System.out.print(" Units:" + eElement.getAttribute("Units"));
 					System.out.print(" Price:" + eElement.getAttribute("Price"));
