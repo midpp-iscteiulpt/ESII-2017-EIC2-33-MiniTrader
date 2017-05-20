@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import mt.Order;
 import mt.comm.ServerComm;
 import mt.comm.ServerSideMessage;
@@ -50,11 +51,15 @@ public class MicroServer implements MicroTraderServer {
 	 * Orders that we must track in order to notify clients
 	 */
 	private Set<Order> updatedOrders;
-
 	/**
 	 * Order Server ID
 	 */
 	private static int transactionID = 1;
+
+	/**
+	 * Transaction ID
+	 */
+	private static int transactionId = 1;
 
 	/**
 	 * Order Server ID
@@ -102,7 +107,8 @@ public class MicroServer implements MicroTraderServer {
 				processUserDisconnected(msg);
 				break;
 			case NEW_ORDER:
-				if(invalidOrderUS(msg.getOrder())) break;
+				if (invalidOrderUS(msg.getOrder()))
+					break;
 				try {
 					verifyUserConnected(msg);
 					if (msg.getOrder().getServerOrderID() == EMPTY) {
@@ -121,14 +127,24 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Shutting Down Server...");
 	}
 
+	/**
+	 * Verify if order is invalid according to business rules and constraints
+	 * specified for the region
+	 * 
+	 * @param order
+	 *            the order sent by the client
+	 * @return false if order if valid true if odder is invalid
+	 */
 	private boolean invalidOrderUS(Order order) {
-		//a single order quantity (buy or sell) can never be lower than 10 units
-		if(order.getNumberOfUnits()<10) return true;
+		// a single order quantity (buy or sell) can never be lower than 10
+		// units
+		if (order.getNumberOfUnits() < 10)
+			return true;
 		int counter = 0;
 
-
-		//sellers cannot have more than five unfulfilled sell orders at any time
-		if(order.isSellOrder()){
+		// sellers cannot have more than five unfulfilled sell orders at any
+		// time
+		if (order.isSellOrder()) {
 
 			for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 				for (Order o : entry.getValue()) {
