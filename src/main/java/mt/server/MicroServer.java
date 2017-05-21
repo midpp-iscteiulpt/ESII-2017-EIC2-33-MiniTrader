@@ -1,3 +1,4 @@
+
 package mt.server;
 
 import java.util.ArrayList;
@@ -413,4 +414,3 @@ public class MicroServer implements MicroTraderServer {
 	}
 
 }
-
