@@ -154,11 +154,11 @@ public class MicroServerTest {
 
 	 @Test
 	 public void testStart4() throws Exception {
-	 when(serverComm.getNextMessage()).thenReturn(msg1).thenReturn(msg10).thenReturn(null);
+	 when(serverComm.getNextMessage()).thenReturn(msg10).thenReturn(null);
 	
 	 ms.start(serverComm);
 	
-	 verify(serverComm, atLeastOnce()).sendError(msg10.getSenderNickname(),
+	 verify(serverComm, atLeastOnce()).sendError(	msg10.getSenderNickname(),
 	 "There was no order in the message");
 	 }
 
@@ -168,7 +168,7 @@ public class MicroServerTest {
 				.thenReturn(null);
 
 		ms.start(serverComm);
-		verify(serverComm, atLeastOnce()).sendOrder("userB", Order.createBuyOrder("userB", "ISCTE", 5, 21.0));
+		verify(serverComm, atLeastOnce()).sendOrder("userA", Order.createBuyOrder("userB", "ISCTE", 15, 21.0));
 
 	}
 
@@ -197,7 +197,7 @@ public class MicroServerTest {
 	 when(serverComm.getNextMessage()).thenReturn(msg1).thenReturn(msg2).thenReturn(msg3).thenReturn(msg4).thenReturn(msg8).thenReturn(msg9).thenReturn(msg10).thenReturn(msg5).thenReturn(msg6).thenReturn(null);
 	 ms.start(serverComm);
 	
-	 verify(serverComm, atLeastOnce()).sendOrder("userA",
-	 Order.createBuyOrder("userB", "ISCTE", 5, 21.0));
+	 verify(serverComm, atLeastOnce()).sendOrder("userB",
+	 Order.createBuyOrder("userA", "ISCTE", 15, 21.0));
 	 }
 }
