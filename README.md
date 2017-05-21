@@ -18,6 +18,10 @@ O trabalho encontra-se completo, sendo que todas as Funcional Requirements e Bus
 e todos os artefactos pedidos foram disponibilizados. 
 
 38043 - Maria Inês Paulo, midpp@iscte-iul.pt
+
 38056 - Nuno Gama Freire, nogcg@iscte-iul.pt
+
 38059 - Filipe Sá, 	  fgsao@iscte-iul.pt
+
 60417 - João Bernardo,	  jmnbo@iscte-iul.pt
+
