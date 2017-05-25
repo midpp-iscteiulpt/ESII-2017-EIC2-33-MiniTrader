@@ -35,7 +35,7 @@ public class MicroServer implements MicroTraderServer {
 		server.start(serverComm);
 	}
 
-	public static final Logger LOGGER = Logger.getLogger(MicroServer.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(MicroServer.class.getName());
 
 	/**
 	 * Server communication
@@ -45,7 +45,7 @@ public class MicroServer implements MicroTraderServer {
 	/**
 	 * A map to sore clients and clients orders
 	 */
-	private Map<String, Set<Order>> orderMap;
+	private final Map<String, Set<Order>> orderMap;
 
 	/**
 	 * Orders that we must track in order to notify clients
@@ -63,14 +63,14 @@ public class MicroServer implements MicroTraderServer {
 	private static int id = 1;
 
 	/** The value is {@value #EMPTY} */
-	public static final int EMPTY = 0;
+	private static final int EMPTY = 0;
 
 	/**
 	 * Constructor
 	 */
 	public MicroServer() {
 		LOGGER.log(Level.INFO, "Creating the server...");
-		orderMap = new HashMap<String, Set<Order>>();
+		orderMap = new HashMap<>();
 		updatedOrders = new HashSet<>();
 	}
 
@@ -82,7 +82,7 @@ public class MicroServer implements MicroTraderServer {
 
 		this.serverComm = serverComm;
 
-		ServerSideMessage msg = null;
+		ServerSideMessage msg;
 		while ((msg = serverComm.getNextMessage()) != null) {
 			ServerSideMessage.Type type = msg.getType();
 
@@ -150,10 +150,7 @@ public class MicroServer implements MicroTraderServer {
 			}
 		}
 		System.out.println(counter);
-		if (counter == 5) {
-			return true;
-		}
-		return false;
+		return counter == 5;
 	}
 
 	/**
