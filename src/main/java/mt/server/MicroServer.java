@@ -62,7 +62,7 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private static int id = 1;
 
-	
+
 	private static final int EMPTY = 0;
 
 	/**
