@@ -156,23 +156,24 @@ public class MicroServer implements MicroTraderServer {
 				}
 			}
 		}
-		// sellers cannot have more than five unfulfilled sell orders at any
-		// time
-		if (order.isSellOrder()) {
+		counter = counter(order, counter);
+		if (counter == 5) {
+			return true;
+		}
+		return false;
+	}
 
+	private int counter(Order order, int counter) {
+		if (order.isSellOrder()) {
 			for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 				for (Order o : entry.getValue()) {
 					if (o.getNickname().equals(order.getNickname()) && o.isSellOrder()) {
 						counter++;
 					}
 				}
-
 			}
 		}
-		if (counter == 5) {
-			return true;
-		}
-		return false;
+		return counter;
 	}
 
 	/**
@@ -327,6 +328,11 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private void processSell(Order sellOrder) {
 		LOGGER.log(Level.INFO, "Processing sell order...");
+		sellOrder(sellOrder);
+
+	}
+
+	private void sellOrder(Order sellOrder) {
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			for (Order o : entry.getValue()) {
 				if (o.isBuyOrder() && o.getStock().equals(sellOrder.getStock())
@@ -335,7 +341,6 @@ public class MicroServer implements MicroTraderServer {
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -348,6 +353,11 @@ public class MicroServer implements MicroTraderServer {
 	private void processBuy(Order buyOrder) {
 		LOGGER.log(Level.INFO, "Processing buy order...");
 
+		buyOrder(buyOrder);
+
+	}
+
+	private void buyOrder(Order buyOrder) {
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			for (Order o : entry.getValue()) {
 				if (o.isSellOrder() && buyOrder.getStock().equals(o.getStock())
@@ -356,7 +366,6 @@ public class MicroServer implements MicroTraderServer {
 				}
 			}
 		}
-
 	}
 
 	/**
