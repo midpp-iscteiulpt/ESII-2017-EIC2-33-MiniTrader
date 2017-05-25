@@ -19,7 +19,7 @@ e todos os artefactos pedidos foram disponibilizados.
 
 38043 - Maria Inês Paulo, midpp@iscte-iul.pt
 
-38056 - Nuno Gama Freire, nogcg@iscte-iul.pt
+38056 - Nuno Gama Freire, nunardas@gmail.com
 
 38059 - Filipe Sá, 	  fgsao@iscte-iul.pt
 
