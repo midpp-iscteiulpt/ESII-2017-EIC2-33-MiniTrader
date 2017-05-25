@@ -215,7 +215,7 @@ public class MicroServer implements MicroTraderServer {
 
 	/**
 	 * Process the user disconnection
-	 * 
+	 * hrome
 	 * @param msg
 	 * 			  the message sent by the client
 	 */

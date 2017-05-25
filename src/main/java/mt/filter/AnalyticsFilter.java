@@ -11,16 +11,15 @@ import mt.comm.ServerSideMessage.Type;
 
 public class AnalyticsFilter implements ServerComm {
 
+	private AnalyticsFilterProduct analyticsFilterProduct = new AnalyticsFilterProduct();
 	private ServerComm decoratedServerComm;
-	private int buyOrders = 0;
-	private int sellOrders = 0;
-	private long timer = 0, testingVariable = 0;
+	private long testingVariable = 0;
 	private ArrayList<ClientMessagesTimer> userMessage;
 	private HashMap<String, List<Long>> map = new HashMap<>();
 
 	public AnalyticsFilter(ServerComm serverCommToDecorate) {
 		decoratedServerComm = serverCommToDecorate;
-		timer = System.currentTimeMillis();
+		analyticsFilterProduct.setTimer(System.currentTimeMillis());
 		userMessage = new ArrayList<>();
 	}
 
@@ -35,9 +34,9 @@ public class AnalyticsFilter implements ServerComm {
 		if (message != null) {
 			if (message.getType() == Type.NEW_ORDER) {
 				if (message.getOrder().isBuyOrder())
-					buyOrders++;
+					analyticsFilterProduct.setBuyOrders(analyticsFilterProduct.getBuyOrders() + 1);
 				else if (message.getOrder().isSellOrder())
-					sellOrders++;
+					analyticsFilterProduct.setSellOrders(analyticsFilterProduct.getSellOrders() + 1);
 				long time = System.currentTimeMillis();
 				String nickname = message.getSenderNickname();
 				if (!map.containsKey(nickname)) {
@@ -79,7 +78,7 @@ public class AnalyticsFilter implements ServerComm {
 				}
 			}
 		}
-		averageBuySellOrders();
+		analyticsFilterProduct.averageBuySellOrders(this);
 		return message;
 	}
 
@@ -90,12 +89,7 @@ public class AnalyticsFilter implements ServerComm {
 	 * 
 	 */
 	public void averageBuySellOrders() {
-		if (is1minuteLong()) {
-			System.out.println("Buy Orders per minute: " + buyOrders + " .\nSell Orders per minute: " + sellOrders + " .");
-			timer = System.currentTimeMillis();
-			buyOrders = 0;
-			sellOrders = 0;
-		}
+		analyticsFilterProduct.averageBuySellOrders(this);
 	}
 
 	public boolean checkDisconectedTimer(String name) {
@@ -117,10 +111,6 @@ public class AnalyticsFilter implements ServerComm {
 
 	public void setVariableTesting(long value) {
 		testingVariable = value;
-	}
-
-	private boolean is1minuteLong() {
-		return timer + 60000 <= getTime();
 	}
 
 	public long getTime() {
