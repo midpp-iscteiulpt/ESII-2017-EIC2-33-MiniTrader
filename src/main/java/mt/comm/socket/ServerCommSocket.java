@@ -23,6 +23,8 @@ import mt.comm.common.CommUtils;
  *
  */
 public class ServerCommSocket extends Thread {
+	private ServerCommSocketProduct serverCommSocketProduct = new ServerCommSocketProduct();
+
 	/**
 	 * The TCP IP port used by server socket in order to receive connections.
 	 */
@@ -32,14 +34,6 @@ public class ServerCommSocket extends Thread {
 	 * The server socket used to receive new client's connections.
 	 */
 	private ServerSocket serverSocket;
-
-	/**
-	 * Auxiliary structure with information about connected users and its output
-	 * stream, in order to be possible to send client messages for the correct
-	 * client, based on its nickname. This structure is also used to validate
-	 * if a certain user, by its nickname, is or not connected.
-	 */
-	private Map<String, ObjectOutputStream> connectedUsers;
 
 	/**
 	 * Reference to the queue used to store messages received from clients.
@@ -60,7 +54,7 @@ public class ServerCommSocket extends Thread {
 		this.serverSocket = new ServerSocket(SERVER_SOCKET_TCP_IP_PORT);
 		System.out.println("ServerComm >> The server socket is available for accepting new connections");
 
-		this.connectedUsers = new HashMap<String, ObjectOutputStream>();
+		serverCommSocketProduct.setConnectedUsers(new HashMap<String, ObjectOutputStream>());
 		this.serverMessages = serverMessages;
 	}
 
@@ -88,13 +82,13 @@ public class ServerCommSocket extends Thread {
 
 				// Validating if a client (nickname) is already connected.
 				String nickname = message.getSenderNickname();
-				if (connectedUsers.get(nickname) != null) {
+				if (serverCommSocketProduct.getConnectedUsers().get(nickname) != null) {
 					final String errorMsg = String.format(CommUtils.USER_IS_ALREADY_CONNECTED, nickname);
 					System.out.println("ServerComm >> " + errorMsg);
 					out.writeObject(CommUtils.createErrorMessage(errorMsg));
 				} else {
 					// Adding information regarding to the new connected user.
-					connectedUsers.put(nickname, out);
+					serverCommSocketProduct.getConnectedUsers().put(nickname, out);
 
 					// Adding connected message to the queue in order to inform
 					// the server component.
@@ -103,7 +97,7 @@ public class ServerCommSocket extends Thread {
 					// Creating a new thread to deal with receiving server
 					// messages sent by the clients.
 					String serverThreadName = "ServerCommThread-" + nickname;
-					ServerCommThread serverCommThread = new ServerCommThread(nickname, clientSocket, in, serverMessages, connectedUsers);
+					ServerCommThread serverCommThread = new ServerCommThread(nickname, clientSocket, in, serverMessages, serverCommSocketProduct.getConnectedUsers());
 					serverCommThread.setName(serverThreadName);
 					serverCommThread.start();
 					System.out.println(String.format("ServerComm >> Starting thread '%s' to handle messages received from client '%s'", serverThreadName, nickname));
@@ -114,8 +108,8 @@ public class ServerCommSocket extends Thread {
 		} finally {
 			try {
 				CommUtils.releaseResources(in, out, clientSocket, serverSocket);
-				connectedUsers.clear();
-				connectedUsers = null;
+				serverCommSocketProduct.getConnectedUsers().clear();
+				serverCommSocketProduct.setConnectedUsers(null);
 				serverMessages.clear();
 				serverMessages = null;
 			} catch (IOException e) {
@@ -133,23 +127,7 @@ public class ServerCommSocket extends Thread {
 	 *            The order to be sent to the client.
 	 */
 	public void sendOrder(String receiversNickname, Order order) {
-		// Retrieving the output stream associated to a certain client.
-		ObjectOutputStream out = connectedUsers.get(receiversNickname);
-		if (out != null) {
-			try {
-				// Creating a client message based on an order.
-				ClientSideMessage message = CommUtils.createOrderMessage(order);
-
-				// Reset output stream due to socket cache
-				out.reset();
-
-				// Sending the message to the client.
-				out.writeObject(message);
-				System.out.println(String.format("ServerComm >> Sending %s to client '%s'", message, receiversNickname));
-			} catch (IOException e) {
-				System.out.println("ServerComm >> An error has thrown while sending a client message due to : " + CommUtils.getCause(e));
-			}
-		}
+		serverCommSocketProduct.sendOrder(receiversNickname, order);
 	}
 
 	/**
@@ -161,20 +139,7 @@ public class ServerCommSocket extends Thread {
 	 *            The error message to be sent.
 	 */
 	public void sendError(String toNickname, String error) {
-		// Retrieving the output stream associated to a certain client.
-		ObjectOutputStream out = connectedUsers.get(toNickname);
-		if (out != null) {
-			try {
-				// Creating a client error message based on an order.
-				ClientSideMessage message = CommUtils.createErrorMessage(error);
-
-				// Sending the message to the client.
-				out.writeObject(message);
-				System.out.println(String.format("ServerComm >> Sending %s to '%s'", message, toNickname));
-			} catch (IOException e) {
-				System.out.println("ServerComm >> An error has thrown while sending an error client message due to: " + CommUtils.getCause(e));
-			}
-		}
+		serverCommSocketProduct.sendError(toNickname, error);
 	}
 
 	/**
@@ -185,7 +150,7 @@ public class ServerCommSocket extends Thread {
 	 * @return True if client is connected, otherwise false.
 	 */
 	public boolean isClientConnected(String nickname) {
-		return connectedUsers.get(nickname) != null;
+		return serverCommSocketProduct.isClientConnected(nickname);
 	}
 
 	/**
@@ -195,15 +160,13 @@ public class ServerCommSocket extends Thread {
 	 *            The client's nickname to be disconnected.
 	 */
 	public void disconnectClient(String nickname) {
-		ObjectOutputStream out = connectedUsers.remove(nickname);
-		if (out != null) {
-			try {
-				CommUtils.releaseResources(out);
-				System.out.println(String.format("ServerComm >> The client '%s' has been disconnected by server", nickname));
-			} catch (IOException e) {
-				System.out.println(String.format("ServerComm >> An error has thrown while disconnecting client '%s' due to: %s", nickname, CommUtils.getCause(e)));
-			}
-		}
+		serverCommSocketProduct.disconnectClient(nickname);
+	}
+
+	public Object clone() throws java.lang.CloneNotSupportedException {
+		ServerCommSocket clone = (ServerCommSocket) super.clone();
+		clone.serverCommSocketProduct = (ServerCommSocketProduct) this.serverCommSocketProduct.clone();
+		return clone;
 	}
 }
 
