@@ -321,14 +321,19 @@ public class MicroServer implements MicroTraderServer {
 	private void processBuy(Order buyOrder) {
 		LOGGER.log(Level.INFO, "Processing buy order...");
 
+		buyOrder(buyOrder);
+
+	}
+
+	private void buyOrder(Order buyOrder) {
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			for (Order o : entry.getValue()) {
-				if (o.isSellOrder() && buyOrder.getStock().equals(o.getStock()) && o.getPricePerUnit() <= buyOrder.getPricePerUnit()) {
+				if (o.isSellOrder() && buyOrder.getStock().equals(o.getStock())
+						&& o.getPricePerUnit() <= buyOrder.getPricePerUnit()) {
 					doTransaction(buyOrder, o);
 				}
 			}
 		}
-
 	}
 
 	/**
