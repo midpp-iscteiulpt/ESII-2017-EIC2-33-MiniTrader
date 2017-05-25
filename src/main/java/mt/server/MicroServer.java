@@ -62,7 +62,7 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private static int id = 1;
 
-	/** The value is {@value #EMPTY} */
+	
 	private static final int EMPTY = 0;
 
 	/**
@@ -198,7 +198,7 @@ public class MicroServer implements MicroTraderServer {
 	
 	/**
 	 * Send current active orders sorted by server ID ASC
-	 * @param msg
+	 * @param msg message to send
 	 */
 	private void notifyClientsOfCurrentActiveOrders(ServerSideMessage msg) {
 		List<Order> ordersToSend = new ArrayList<>();
